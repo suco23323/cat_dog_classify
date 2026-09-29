@@ -3,8 +3,9 @@ title: Cat Dog Classifier API
 emoji: 🐱
 colorFrom: blue
 colorTo: green
-sdk: docker
-app_port: 7860
+sdk: gradio
+sdk_version: 5.49.1
+app_file: app.py
 pinned: false
 ---
 
@@ -17,14 +18,14 @@ Vue 3 前端 + FastAPI/PyTorch CPU 后端的猫狗图片分类实验，适合作
 ```text
 浏览器
   ├── Vue 3 / Vite 静态页面  -> Vercel
-  └── FastAPI API + 模型推理 -> Hugging Face Spaces(Docker, CPU Basic)
+  └── FastAPI API + 模型推理 -> Hugging Face Spaces(Gradio SDK, CPU Basic)
                                   └── best_model_opt20.pth
 ```
 
-后端首选 **Hugging Face Spaces 的免费 Docker CPU Space**：
+后端首选 **Hugging Face Spaces 的免费 Gradio CPU Space**：
 
 - PyTorch 是 CPU 推理，不需要 GPU；
-- Docker 方式与当前项目结构最匹配；
+- 根目录 app.py 复用现有 FastAPI 应用，Space 首页由 Gradio 提供；
 - 免费额度通常为 2 vCPU / 16 GB 内存，运行当前 ResNet 模型足够；
 - 长期无人访问后可能休眠，首次请求需要冷启动；
 - 免费环境没有可靠持久化，SQLite 历史记录和上传图片会在重建/重启后丢失，Demo 可接受。
@@ -69,7 +70,7 @@ npm run dev
 
 ### 1. 上传 GitHub
 
-仓库根目录已经包含后端 Dockerfile，不能只上传 `frontend/` 或 `backend/` 子目录。
+仓库根目录已经包含 Hugging Face Gradio 入口 `app.py`、根依赖 `requirements.txt` 和后端代码，不能只上传 `frontend/` 或 `backend/` 子目录。
 
 ```powershell
 git init
@@ -82,12 +83,12 @@ git push -u origin main
 
 `best_model_opt20.pth` 约 45 MB，低于 GitHub 单文件 100 MB 限制，可以正常提交。上传图片、历史记录、SQLite 数据库、`node_modules` 和构建产物已由 `.gitignore` 排除。
 
-### 2. 部署 FastAPI 后端到 Hugging Face Spaces
+### 2. 部署 FastAPI 后端到 Hugging Face Spaces（Gradio SDK）
 
 1. 登录 Hugging Face，创建一个新 Space。
-2. 选择 **Docker** SDK 和 **CPU Basic** 免费硬件。
+2. 选择 **Gradio** SDK、Blank 模板和 **CPU Basic** 免费硬件。
 3. 选择从 GitHub 仓库导入，或者把当前仓库推送到 Space 仓库。
-4. 确认 Space 的 README 顶部仍保留本文件开头的 `sdk: docker` 和 `app_port: 7860` 元数据。
+4. 确认 README 顶部保留 `sdk: gradio`、`sdk_version: 5.49.1` 和 `app_file: app.py`。
 5. 部署完成后确认健康检查可用：
 
 ```text
